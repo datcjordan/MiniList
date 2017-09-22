@@ -5,7 +5,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Points points="0" />
+        <Points points= "0" />
         <Slogan title="A minimal to do list." />
         <TodoList />
       </div>
@@ -29,40 +29,85 @@ const Points = (props) => {
   )
 }
 
-const TodoList = (props) => {
+class InputBox extends Component {
 
-  const renderTodos = () => {
-    for (var i = 1; i <= 10; i++) {
-      return (
-        <TodoList num="1" title="" />
-      )
+  constructor(props) {
+    super(props);
+
+    this.handleTextChange = this.handleTextChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+
+    this.state = {
+      inputValue: "",
     }
   }
 
-  return (
-    <div className="container">
-      <div className="lists">
-        <form>
-          <input type="text" placeholder="Add a new todo here..." />
-        </form>
-        <TodoItem num="1" title="Hell yea man" />
-        <li className="item"><span className="num">2</span><a href="#">X</a></li>
-        <li className="item"><span className="num">3</span><a href="#">X</a></li>
-        <li className="item"><span className="num">4</span><a href="#">X</a></li>
-        <li className="item"><span className="num">5</span><a href="#">X</a></li>
-        <li className="item"><span className="num">6</span><a href="#">X</a></li>
-        <li className="item"><span className="num">7</span><a href="#">X</a></li>
-        <li className="item"><span className="num">8</span><a href="#">X</a></li>
-        <li className="item"><span className="num">9</span><a href="#">X</a></li>
-        <li className="item"><span className="num">10</span><a href="#">X</a></li>
+  handleTextChange(event) {
+    console.log(event.target.value);
+    this.setState({ inputValue: event.target.value });
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    this.props.onSubmit(this.state.inputValue);
+    this.setState({ inputValue: ""});
+  }
+
+  render() {
+    return(
+      <form onSubmit={ this.handleSubmit } >
+        <input type="text"
+        placeholder={ this.props.placeholder }
+        value={ this.state.inputValue }
+        onChange={ this.handleTextChange }
+        />
+      </form>
+    );
+  }
+}
+
+class TodoList extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      titles: [],
+    }
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(value) {
+    console.log(this.state.titles);
+    const newTitles = [...this.state.titles, value];
+    this.setState({titles: newTitles});
+  }
+
+  render() {
+
+    let todos = [];
+
+    for (var i = 1; i <= 10; i++) {
+      todos.push(<TodoItem key={`${i}`} num={`${i}`} title = {this.state.titles[i - 1] ? this.state.titles[i - 1]: ""} />);
+    }
+
+    return (
+      <div className="container">
+        <div className="lists">
+          <InputBox
+          placeholder="Add a new todo here..."
+          onSubmit={this.handleSubmit} />
+          { todos }
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 const TodoItem = (props) => {
   return (
-    <li className="item"><span className="num">{props.num}</span>{props.title}<a href="#">X</a></li>
+    <li className="item"><span className="num">{props.num}</span>{props.title}<button>X</button></li>
   );
 }
 
